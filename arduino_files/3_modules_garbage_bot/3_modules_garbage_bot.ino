@@ -23,22 +23,22 @@ void loop() {
 
   if (angle < 90)
   {
-    for (int step=0; step<angle; step++) { // goes from 0 degrees to 180 degrees in steps of 1 degree
+    for (int step=0; step<angle; step++) {  // servo8 is going up
       servo8.write(max(90 - ratio8 * step, 0));
       servo9.write(90 - step);
-      delay(25);  // waits 25ms for the servo to reach the position
+      delay(25);  // waits 25ms for the servos to reach positions
     }
-    for (int step=0; step<angle; step++) { // goes from 180 degrees to 0 degrees
+    for (int step=0; step<angle; step++) {  // servo8 is going down
       servo8.write(min(ratio8 * step, 90));
       servo9.write(angle + step);
       delay(25);
     }
-    for (int step=0; step<angle; step++) {
+    for (int step=0; step<angle; step++) {  // servo9 is going up
       servo8.write(90 + step);
       servo9.write(90 + ratio9 * step); 
       delay(25); 
     }
-    for (int step=0; step<angle; step++) { // goes from 180 degrees to 0 degrees
+    for (int step=0; step<angle; step++) {  // servo9 is going down
       servo8.write(90 + angle - step);
       servo9.write(max(90 + angle + 90 + angle / 2 - ratio9 * step, 90)); 
       delay(25);
