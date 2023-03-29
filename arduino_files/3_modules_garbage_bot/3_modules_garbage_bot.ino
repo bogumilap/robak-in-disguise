@@ -1,34 +1,47 @@
 #include <Servo.h>
 
-Servo myservo;  // create servo object to control a servo
-Servo second;
-// twelve servo objects can be created on most boards
+// create servo objects to control servos
+Servo servo8;
+Servo servo9;  
 
-int pos = 0;    // variable to store the servo position
 int angle = 45;
 
+
 void setup() {
-  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
-  second.attach(8);
+  // attaches servoes on pins to the servo objects
+  servo8.attach(8);
+  servo9.attach(9); 
 }
 
 void loop() {
-  // pos = - angle;
-  myservo.write(90);              // tell servo to go to position in variable 'pos'
+  servo8.write(90);  // tell servo to go to given position
+  servo9.write(90);
 
-  second.write(90);
+  // these ratios work only for angle = 45
+  double ratio8 = 2;  // 90 / 45
+  double ratio9 = 3.5;  // (90 + 45 + 22.5) / 45
+
   if (angle < 90)
   {
-    // for (pos = 90 - angle; pos <= 90 + angle; pos += 1) { // goes from 0 degrees to 180 degrees
-    //   // in steps of 1 degree
-    //   myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    //   second.write(pos);
-    //   delay(25);                       // waits 15ms for the servo to reach the position
-    // }
-    // for (pos = 90 + angle; pos >= 90 - angle; pos -= 1) { // goes from 180 degrees to 0 degrees
-    //   myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    //   second.write(pos);
-    //   delay(25);                       // waits 15ms for the servo to reach the position
-    // }
-}
+    for (int step=0; step<angle; step++) { // goes from 0 degrees to 180 degrees in steps of 1 degree
+      servo8.write(max(90 - ratio8 * step, 0));
+      servo9.write(90 - step);
+      delay(25);  // waits 25ms for the servo to reach the position
+    }
+    for (int step=0; step<angle; step++) { // goes from 180 degrees to 0 degrees
+      servo8.write(min(ratio8 * step, 90));
+      servo9.write(angle + step);
+      delay(25);
+    }
+    for (int step=0; step<angle; step++) {
+      servo8.write(90 + step);
+      servo9.write(90 + ratio9 * step); 
+      delay(25); 
+    }
+    for (int step=0; step<angle; step++) { // goes from 180 degrees to 0 degrees
+      servo8.write(90 + angle - step);
+      servo9.write(max(90 + angle + 90 + angle / 2 - ratio9 * step, 90)); 
+      delay(25);
+    }
+  }
 }
