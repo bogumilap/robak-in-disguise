@@ -24,20 +24,20 @@ void loop() {
     for (int step=0; step<angle; step++) {  // servo8 is going up
       servo8.write(max(90 - ratio8 * step, 0));
       servo9.write(90 - step);
-      delay(25);  // waits 25ms for the servos to reach positions
+      delay(15);  // waits 25ms for the servos to reach positions
     }
     for (int step=0; step<angle; step++) {
       servo9.write(angle + 3 * step);
-      delay(25);
+      delay(15);
     }
     for (int step=0; step<angle; step++) {
       servo8.write(3 * step);
-      delay(25);
+      delay(15);
     }
     for (int step=0; step<angle; step++) {
       servo8.write(3 * angle - step);
       servo9.write(180 - 2 * step);
-      delay(25);
+      delay(15);
     }
   }
 }
