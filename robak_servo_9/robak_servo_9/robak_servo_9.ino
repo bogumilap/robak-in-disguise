@@ -3,17 +3,16 @@ int MAX_US = 2400;
 int DELAY_VALUE = 5;
 bool FOLDED = false;
 bool CRAWLING = false;
-float delay9 = (MIN_US + MAX_US) / 2;
+float DELAY8 = (MIN_US + MAX_US) / 2;
+float DELAY9 = (MIN_US + MAX_US) / 2;
+float DELAY10 = (MIN_US + MAX_US) / 2;
 
-void setAngle(float angle, int pinID) {
+
+void setDelay(float angle, float* delay_pointer) {
   if (angle > 180 || angle < 0) {
     return;
   }
-  float delay = MIN_US + (angle / 180) * (MAX_US - MIN_US);
-  if (pinID == 9){
-    delay9 = delay;
-  }
-  
+  *delay_pointer = MIN_US + (angle / 180) * (MAX_US - MIN_US);
 }
 
 
@@ -44,12 +43,12 @@ void setup() {
 }//end setup
 
 ISR(TIMER1_COMPA_vect){
-  // Serial.print(delay9);
+  // Serial.print(DELAY9);
   // Serial.print("\n");
   digitalWrite(9, HIGH);
-  delayMicroseconds(delay9);
+  delayMicroseconds(DELAY9);
   digitalWrite(9, LOW);
-  delayMicroseconds(20000 - delay9);
+  delayMicroseconds(20000 - DELAY9);
 }
 
 void loop() {
@@ -108,9 +107,9 @@ void stop() {
     unfold();
     FOLDED = false;
   } else {
-    setAngle(90, 8);
-    setAngle(90, 9);
-    setAngle(90, 10);
+    setDelay(90, &DELAY8);
+    setDelay(90, &DELAY9);
+    setDelay(90, &DELAY10);
   }
   CRAWLING = false;
 }
@@ -120,33 +119,33 @@ void crawl() {
 
   // 0, 0, 90
   for (int step=0; step<angle; step++) {
-    setAngle(90 - 2 * step, 8);
-    setAngle(90 - 2 * step, 9);
+    setDelay(90 - 2 * step, &DELAY8);
+    setDelay(90 - 2 * step, &DELAY9);
     delay(DELAY_VALUE);
   }
 
   // 0, 45, 90
   for (int step=0; step<angle; step++) {
-    setAngle(step, 9);
+    setDelay(step, &DELAY9);
     delay(DELAY_VALUE);
   }
 
   // 0, 45, 135
   for (int step=0; step<angle; step++) {
-    setAngle(90 + step, 10);
+    setDelay(90 + step, &DELAY10);
     delay(DELAY_VALUE);
   }
 
   // 90, 90, 135
   for (int step=0; step<angle; step++) {
-    setAngle(2 * step, 8);
-    setAngle(45 + step, 9);
+    setDelay(2 * step, &DELAY8);
+    setDelay(45 + step, &DELAY9);
     delay(DELAY_VALUE);
   }
   
   // 90, 90, 90
   for (int step=0; step<angle; step++) {
-    setAngle(135 - step, 10);
+    setDelay(135 - step, &DELAY10);
     delay(DELAY_VALUE);
   }
 }
@@ -154,16 +153,16 @@ void crawl() {
 void fold() {
   if (! FOLDED) {
     for (int step=90; step<180; step++) {
-      setAngle(step, 8);
-      // setAngle(step, 10);
+      setDelay(step, &DELAY8);
+      // setDelay(step, &DELAY10);
       delay(DELAY_VALUE);
     }
     for (int step=90; step>0; step--) {
-      setAngle(step, 9);
+      setDelay(step, &DELAY9);
       delay(DELAY_VALUE);
     }
     for (int step=90; step<180; step++) {
-      setAngle(step, 10);
+      setDelay(step, &DELAY10);
       delay(DELAY_VALUE);
     }
     FOLDED = true;
@@ -173,12 +172,12 @@ void fold() {
 void unfold() {
   if (FOLDED) {
     for (int step=0; step<90; step++) {
-      setAngle(step, 9);
+      setDelay(step, &DELAY9);
       delay(DELAY_VALUE);
     }
     for (int step=180; step>90; step--) {
-      setAngle(step, 8);
-      setAngle(step, 10);
+      setDelay(step, &DELAY8);
+      setDelay(step, &DELAY10);
       delay(DELAY_VALUE);
     }
     FOLDED = false;
@@ -193,67 +192,67 @@ void dance() {
   int angle = 45;
   // one second - arm 1
   for (int step=0; step<50; step++) {  // servo8 is going up
-    setAngle(base_angle + step, 8);
+    setDelay(base_angle + step, &DELAY8);
     delay(10); 
   }
   for (int step=49; step>=0; step--) {  // servo8 is going up
-    setAngle(base_angle + step, 8);
+    setDelay(base_angle + step, &DELAY8);
     delay(10); 
   }
 
   // 1 s - arm 2
   for (int step=0; step<50; step++) {  // servo8 is going up
-    setAngle(base_angle + step, 10);
+    setDelay(base_angle + step, &DELAY10);
     delay(10); 
   }
   for (int step=49; step>=0; step--) {  // servo8 is going up
-    setAngle(base_angle + step, 10);
+    setDelay(base_angle + step, &DELAY10);
     delay(10); 
   }
 
   // 1 s - /\/\ ...
   for (int step=0; step<angle; step++) {  // servo8 is going up
-    setAngle(base_angle - 2 * step, 8);
-    setAngle(base_angle - 2 * step, 9);
-    setAngle(base_angle - 2 * step, 10);
+    setDelay(base_angle - 2 * step, &DELAY8);
+    setDelay(base_angle - 2 * step, &DELAY9);
+    setDelay(base_angle - 2 * step, &DELAY10);
     delay(11); 
   }
   delay(5);
   for (int step=angle-1; step>=0; step--) {  // servo8 is going up
-    setAngle(base_angle - 2 * step, 8);
-    setAngle(base_angle - 2 * step, 9);
-    setAngle(base_angle - 2 * step, 10);
+    setDelay(base_angle - 2 * step, &DELAY8);
+    setDelay(base_angle - 2 * step, &DELAY9);
+    setDelay(base_angle - 2 * step, &DELAY10);
     delay(11); 
   }
   delay(5);
 
   // 1 s - \_/
   for (int step=0; step<50; step++) {  // servo8 is going up
-    setAngle(base_angle + step, 8);
-    setAngle(base_angle + step, 10);
+    setDelay(base_angle + step, &DELAY8);
+    setDelay(base_angle + step, &DELAY10);
     delay(10); 
   }
   for (int step=49; step>=0; step--) {  // servo8 is going up
-    setAngle(base_angle + step, 8);
-    setAngle(base_angle + step, 10);
+    setDelay(base_angle + step, &DELAY8);
+    setDelay(base_angle + step, &DELAY10);
     delay(10); 
   }
 
   // 4 s - arm 1, 2 up, down
   for (int step=0; step<50; step++) {  // servo8 is going up
-    setAngle(base_angle + step, 8);
+    setDelay(base_angle + step, &DELAY8);
     delay(20); 
   }
   for (int step=0; step<50; step++) {  // servo8 is going up
-    setAngle(base_angle + step, 10);
+    setDelay(base_angle + step, &DELAY10);
     delay(20); 
   }
   for (int step=49; step>=0; step--) {  // servo8 is going up
-    setAngle(base_angle + step, 10);
+    setDelay(base_angle + step, &DELAY10);
     delay(20); 
   }
   for (int step=49; step>=0; step--) {  // servo8 is going up
-    setAngle(base_angle + step, 8);
+    setDelay(base_angle + step, &DELAY8);
     delay(20); 
   }
 
@@ -261,31 +260,31 @@ void dance() {
     // sum = 2s 
     // 0.5s - /\_
     for (int step=0; step<angle; step++) {  // servo8 is going up
-      setAngle(base_angle + 2 * step, 8);
-      setAngle(base_angle + step, 9);
+      setDelay(base_angle + 2 * step, &DELAY8);
+      setDelay(base_angle + step, &DELAY9);
       delay(11); 
     }
     delay(5);
 
     // 0.5s - /\/\ ...
     for (int step=0; step<angle; step++) {  // servo8 is going up
-      setAngle(base_angle + 2 * step, 10);
-      setAngle(base_angle + angle + step, 9);
+      setDelay(base_angle + 2 * step, &DELAY10);
+      setDelay(base_angle + angle + step, &DELAY9);
       delay(11); 
     }
     delay(5);
 
     // 0.5s - /\_
     for (int step=angle-1; step<=0; step--) {  // servo8 is going up
-      setAngle(base_angle - 2 * step, 8);
-      setAngle(base_angle + angle - step, 9);
+      setDelay(base_angle - 2 * step, &DELAY8);
+      setDelay(base_angle + angle - step, &DELAY9);
       delay(11); 
     }
     delay(5);
     // 0.5s - ____
     for (int step=angle-1; step<=0; step--) {  // servo8 is going up
-      setAngle(base_angle - 2 * step, 8);
-      setAngle(base_angle - step, 9);
+      setDelay(base_angle - 2 * step, &DELAY8);
+      setDelay(base_angle - step, &DELAY9);
       delay(11); 
     }
     delay(5);
@@ -293,26 +292,26 @@ void dance() {
 
     // fold - 4s
     for (int step=0; step<angle; step++) {
-      setAngle(base_angle + 2 * step, 8);
-      setAngle(base_angle + 2 * step, 10);
+      setDelay(base_angle + 2 * step, &DELAY8);
+      setDelay(base_angle + 2 * step, &DELAY10);
       delay(44); 
     }
     delay(20);
     for (int step=0; step<angle; step++) {
-      setAngle(base_angle - 2 * step, 9);
+      setDelay(base_angle - 2 * step, &DELAY9);
       delay(44); 
     }
     delay(20);
 
     // unfold - 4s
     for (int step=0; step<angle; step++) {
-      setAngle(base_angle + 2 * (angle - step - 1), 9);
+      setDelay(base_angle + 2 * (angle - step - 1), &DELAY9);
       delay(44); 
     }
     delay(20);
     for (int step=0; step<angle; step++) {
-      setAngle(base_angle - 2 * (angle - step - 1), 8);
-      setAngle(base_angle - 2 * (angle - step - 1), 10);
+      setDelay(base_angle - 2 * (angle - step - 1), &DELAY8);
+      setDelay(base_angle - 2 * (angle - step - 1), &DELAY10);
       delay(44); 
     }
     delay(20);
@@ -320,38 +319,38 @@ void dance() {
     // fala - 6 s
     // /\_ - 1s
     for (int step=0; step<angle; step++) {  // servo8 is going up
-      setAngle(base_angle + 2 * step, 8);
-      setAngle(base_angle + step, 9);
+      setDelay(base_angle + 2 * step, &DELAY8);
+      setDelay(base_angle + step, &DELAY9);
       delay(22); 
     }
     delay(10);
     for(int i=0; i<2; i++) { // loop - 2s 
     // _/\ - 1 s 
       for (int step=0; step<angle; step++) {  // servo8 is going up
-        setAngle(base_angle + 2 * step, 10);
-        setAngle(base_angle + 2 * (angle - step - 1), 8);
+        setDelay(base_angle + 2 * step, &DELAY10);
+        setDelay(base_angle + 2 * (angle - step - 1), &DELAY8);
         delay(22); 
       }
       delay(10);
       for (int step=0; step<angle; step++) {  // servo8 is going up
-        setAngle(base_angle + 2 * step, 8);
-        setAngle(base_angle + 2 * (angle - step - 1), 10);
+        setDelay(base_angle + 2 * step, &DELAY8);
+        setDelay(base_angle + 2 * (angle - step - 1), &DELAY10);
         delay(22); 
       }
       delay(10);
     }
     for (int step=0; step<angle; step++) {  // servo8 is going up
-      setAngle(base_angle + 2 * (angle - step - 1), 8);
-      setAngle(base_angle + (angle - step - 1), 9);
+      setDelay(base_angle + 2 * (angle - step - 1), &DELAY8);
+      setDelay(base_angle + (angle - step - 1), &DELAY9);
       delay(22); 
     }
     delay(10);
   }
 
   for (int step=0; step<angle; step++) {  // servo8 is going up
-    setAngle(base_angle - 2 * step, 8);
-    setAngle(base_angle - min(step, 30), 9);
-    setAngle(base_angle - min(step, 15), 10);
+    setDelay(base_angle - 2 * step, &DELAY8);
+    setDelay(base_angle - min(step, 30), &DELAY9);
+    setDelay(base_angle - min(step, 15), &DELAY10);
     delay(11); 
   }
 }
