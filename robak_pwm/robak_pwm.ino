@@ -6,6 +6,7 @@ bool CRAWLING = false;
 float DELAY8 = (MIN_US + MAX_US) / 2;
 float DELAY9 = (MIN_US + MAX_US) / 2;
 float DELAY10 = (MIN_US + MAX_US) / 2;
+int CURRENT_SERVO = 8;
 
 
 void setDelay(float angle, float* delay_pointer) {
@@ -13,6 +14,9 @@ void setDelay(float angle, float* delay_pointer) {
     return;
   }
   *delay_pointer = MIN_US + (angle / 180) * (MAX_US - MIN_US);
+  // Serial.print(CURRENT_SERVO);
+  // Serial.print("\nCURRENT_SERVO\n");
+  // Serial.print((CURRENT_SERVO - 7) % 3);
 }
 
 
@@ -43,12 +47,20 @@ void setup() {
 }//end setup
 
 ISR(TIMER1_COMPA_vect){
-  // Serial.print(DELAY9);
-  // Serial.print("\n");
-  digitalWrite(9, HIGH);
-  delayMicroseconds(DELAY9);
-  digitalWrite(9, LOW);
-  delayMicroseconds(20000 - DELAY9);
+  float delay = DELAY8;
+  if (CURRENT_SERVO == 9){
+    delay = DELAY9;
+  }
+  if (CURRENT_SERVO == 10){
+    delay = DELAY10;
+  }
+  // Serial.print(delay);
+  digitalWrite(CURRENT_SERVO, HIGH);
+  delayMicroseconds(delay);
+  digitalWrite(CURRENT_SERVO, LOW);
+  delayMicroseconds(20000 - delay);
+
+  CURRENT_SERVO = 8 + (CURRENT_SERVO - 7) % 3;
 }
 
 void loop() {
